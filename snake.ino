@@ -2,13 +2,19 @@
 LiquidCrystal lcd (2, 3, 4, 5, 6, 7);
 const int SPEED = 100;
 // joystick
-const int X_AXIS = 0;
-const int Y_AXIS = 1;
+const int X_AXIS_PIN = 0;
+const int Y_AXIS_PIN = 1;
 
+//setupable
+const int minCol = 0;
+const int minRow = 0;
 const int heightCell = 8;
 const int widthCell = 5;
 const int maxCol = 16;
 const int maxRow = 2;
+
+const int xMin = minCol*widthCell;
+const int yMin = minRow*heightCell;
 const int xMax = (widthCell*maxCol)-1;
 const int yMax = (heightCell*maxRow)-1;
 const int xPosArray[5] = {16, 8, 4, 2, 1};
@@ -16,8 +22,8 @@ const int xPosArray[5] = {16, 8, 4, 2, 1};
 int currentCol = 0;
 int currentRow = 0;
 
-int snakeX = 0;
-int snakeY = 0;
+int snakeX = xMin;
+int snakeY = yMin;
 
 byte nextChar[heightCell] = {};
 
@@ -28,8 +34,8 @@ void setup() {
 
 void loop() {
 
-  int xJoyStick = readJoystick(X_AXIS);
-  int yJoyStick = readJoystick(Y_AXIS);
+  int xJoyStick = readJoystick(X_AXIS_PIN);
+  int yJoyStick = readJoystick(Y_AXIS_PIN);
 
   moveSnake(xJoyStick, yJoyStick);
 
@@ -53,14 +59,14 @@ void writeOnLcd(){
 void setColRow(int x, int y) {
   currentCol = int(x / widthCell);
 
-  if (currentCol > maxCol) {
-    currentCol = 0;
+  if (currentCol > maxCol || currentCol < minCol) {
+    currentCol = minCol;
   }
 
   currentRow = int(y / heightCell);
 
-  if (currentRow > maxRow) {
-    currentRow = 0;
+  if(currentRow < minRow || currentRow > maxRow) {
+    currentRow = minRow;
   }
 }
 
@@ -76,18 +82,18 @@ void createNextChar(int x, int y) {
 
 void detectOverflowPositions(int x, int y) {
   if (x > xMax) {
-    snakeX = 0;
+    snakeX = xMin;
   }
 
   if (y > yMax) {
-    snakeY = 0;
+    snakeY = yMin;
   }
 
-  if (x < 0) {
+  if (x < xMin) {
     snakeX = xMax;
   }
 
-  if (y < 0) {
+  if (y < yMin) {
     snakeY = yMax;
   }
 }
